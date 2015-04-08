@@ -64,10 +64,14 @@ public:
 	 *
 	 *	@param duetime:	定时任务，表示从现在开始多久执行，单位是毫秒（没必要那么精细）(默认0为马上执行)
 	 *	@param period:	定时任务，>0 表示这是一个循环执行任务，单位是毫秒。如果为默认0，表示这个任务只执行一次
-	 *	@param group:	任务分组，暂时占位，以后会根据组来分配执行线程数
+	 *	@high_priv:		高优先级任务，会排在任务队列的前端(适合重做的任务)
+	 *	@param group:	任务分组，暂时占位，以后会根据组来分配执行线程数(也就是说这个组的任务只能占有多少个线程)(可以利用
+	 *		线程的私有队列来进行映射达到这个功能: 一个组 1:M 个线程)
+	 *	@param task_key: 任务的key，用来在某个线程上排队
 	 */
 	int PutTask(SimpleCallback callback, PVOID user_data, ClearCallback cbClear = NULL,
-					int duetime=0, int period=0, const char* group=NULL);
+					int duetime=0, int period=0, bool high_priv=false, 
+					const char* group=NULL, const char * task_key=NULL);
 
 //group
 

@@ -263,7 +263,7 @@ VOID CALLBACK CMyThreadPool::TimerAPCProc(
 
 //外部线程
 int CMyThreadPool::PutTask(SimpleCallback callback, PVOID user_data, ClearCallback cbClear,
-				int duetime, int period, const char * group)
+				int duetime, int period, bool high_priv, const char * group, const char * task_key)
 {
 	CSLock lock(m_lock);
 	if(Closed()) return -1;
@@ -283,7 +283,10 @@ int CMyThreadPool::PutTask(SimpleCallback callback, PVOID user_data, ClearCallba
 		}
 		else
 			new(ptask) TPTask(callback, user_data, cbClear);
-		m_readyQueue.push(ptask);
+		if(high_priv)
+			m_readyQueue.push_front(ptask);
+		else
+			m_readyQueue.push(ptask);
 		return 0;
 	}
 
@@ -299,6 +302,7 @@ int CMyThreadPool::PutTask(SimpleCallback callback, PVOID user_data, ClearCallba
 	return 0;
 }
 
+//TODO:支持线程的私有队列
 void CMyThreadPool::Run(HANDLE hThread)
 {
 	HANDLE ev = m_readyQueue.GetWaitHandle();
