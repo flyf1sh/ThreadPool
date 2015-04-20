@@ -5,8 +5,9 @@
 using namespace std;
 #include "util.h"
 
+
 template <typename C>
-class CThreadSafeQueue : protected std::list<C>
+class CThreadSafeQueue: protected list<C>
 {
 public:
 	CThreadSafeQueue(HANDLE evEmpty=NULL, stdCallback cbOnEmpty=NULL, void * cbParam=NULL)
@@ -33,10 +34,13 @@ public:
 		::SetEvent(m_ev);
 	}
 
-	void push(C& c)
+	void push(C& c, bool high_priv=false)
 	{
 		CSLock lock(m_Crit);
-		push_back(c);
+		if(!high_priv)
+			push_back(c);
+		else
+			__super::push_front(c);
 		::SetEvent(m_ev);
 	}
 
@@ -110,4 +114,5 @@ protected:
 	stdCallback	m_onEmpty;
 	void * m_cbParam;
 };
+
 #endif

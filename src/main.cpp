@@ -42,7 +42,7 @@ void myTimer_fun(void * data)
 void myTimer_clear(bool not_running, void * data)
 {
 	timer_param * p = (timer_param*)data;
-	logc(COLOR_RED, "thread:%ld: timer task:%d end\n", GetCurrentThreadId(), p->id);
+	logc(COLOR_RED, "thread:%ld: timer task:%d clear\n", GetCurrentThreadId(), p->id);
 	delete p;
 }
 

@@ -35,16 +35,16 @@ public:
 	{
 		if(Closed())
 		{
-			log("WaitOnQuit::closed, return");
+			log("WaitOnQuit::closed, return\n");
 			return;
 		}
 		bool need_wait = m_nThread > 0 ? true : false;
 		Close();
 		if(need_wait)
 		{
-			log("WaitOnQuit::need wait threads quits");
+			log("WaitOnQuit::need wait threads quits\n");
 			WaitForSingleObject(m_evQuit, INFINITE);		
-			log("WaitOnQuit::all threads quits");
+			log("WaitOnQuit::all threads quits\n");
 		}
 	}
 	HANDLE GetWaitHandle() const {return m_evQuit;}
@@ -60,7 +60,7 @@ public:
 	/*
 	 *	@param callback: 执行的函数指针
 	 *	@param user_data:	用户数据参数，回调函数处理(用户负责分配和销毁)
-	 *	@param cbClear: 任务被清理时候的调用, 主要是用来销毁参数user_data；为NULL时，如被撤销，系统默认delete user_data
+	 *	@param cbClear: 任务被清理时候的调用, 是用来销毁参数user_data；为NULL时，如被撤销，系统默认delete user_data
 	 *
 	 *	@param duetime:	定时任务，表示从现在开始多久执行，单位是毫秒（没必要那么精细）(默认0为马上执行)
 	 *	@param period:	定时任务，>0 表示这是一个循环执行任务，单位是毫秒。如果为默认0，表示这个任务只执行一次
@@ -73,6 +73,9 @@ public:
 					int duetime=0, int period=0, bool high_priv=false, 
 					const char* group=NULL, const char * task_key=NULL);
 
+	//可以用来做cbClear 的参数
+	static void DoNothing(bool not_running, void* pt) { };
+
 //group
 
 private:
@@ -82,6 +85,7 @@ private:
 	static unsigned __stdcall CALLBACK _TP_WorkCallBack(PVOID pool);
 	static void TimerTaskHandler(PVOID data);
 	static void TimerCallback(PVOID data);
+	static void LoadTimeTask(TimerTask *ptt, SimpleCallback cb, bool high_priv=false);
 
 public:
 	void erase_timer(TimerTask* ptt)
@@ -117,6 +121,5 @@ private:
 	HANDLE m_evQuit;
 	volatile BOOL m_alreadyMarkCancel;
 };
-
 
 #endif
